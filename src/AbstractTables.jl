@@ -23,6 +23,7 @@ include("show.jl")
 
 include("column_indexable/interface.jl")
 include("column_indexable/iteration.jl")
+include("column_indexable/show.jl")
 
 include("column_indexable/grouped/typedef.jl")
 include("column_indexable/grouped/show.jl")
