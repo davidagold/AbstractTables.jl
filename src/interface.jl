@@ -23,8 +23,3 @@ function nrow end
 """
 """
 function index end
-
-function index(tbl::AbstractTable)
-    msg = @sprintf("Objects of type %s are not column-indexable", typeof(tbl))
-    throw(ArgumentError(msg))
-end

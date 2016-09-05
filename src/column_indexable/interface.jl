@@ -1,6 +1,5 @@
 # Interface requirements:
 # * columns
-# * index
 # * Base.getindex(tbl, field)
 # * Base.setindex!(tbl, col, field)
 
