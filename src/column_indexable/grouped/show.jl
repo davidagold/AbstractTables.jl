@@ -7,17 +7,18 @@ function Base.show(
 )::Void
     groupbys = g_tbl.groupbys
     nargs = length(groupbys)
-    println(io, typeof(g_tbl))
+    @printf(io, "Grouped %s\n", typeof(g_tbl).parameters[1])
     println(io, "Groupings by:")
     for groupby in groupbys
         print(io, " "^4)
         print_groupby(io, groupby, g_tbl.predicate_aliases)
     end
     println()
-    return show(io, g_tbl.source, :Row, false)
+    print(io, "Source: "); show(io, g_tbl.source)
+    return
 end
 
-function print_groupby(io, groupby::Union{Symbol, Expr}, predicate_aliases)
+function print_groupby(io, groupby, predicate_aliases)::Void
     if isa(groupby, Symbol)
         @printf(io, "%s \n", string(groupby))
     else
