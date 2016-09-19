@@ -28,8 +28,8 @@ Grow non-null values.
 @noinline function grow_nonnull_output!(output, f, tpl_itr)
     for (i, tpl) in enumerate(tpl_itr)
         # Automatically lift the function f here.
-        if !hasnulls(tpl)
-            push!(output, f(map(unwrap, tpl)))
+        if !jplyr.hasnulls(tpl)
+            push!(output, f(map(jplyr.unsafe_get, tpl)))
         end
     end
     return

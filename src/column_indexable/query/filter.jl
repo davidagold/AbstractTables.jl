@@ -24,9 +24,9 @@ function _apply!(res, helper::jplyr.FilterHelper, row_itr)::Void
     # TODO: Make sure following is safe (in case of error in push!ing)
     for whole_row in row_itr
         args = whole_row[indices]
-        if hasnulls(args)
+        if jplyr.hasnulls(args)
             continue
-        elseif f(map(unwrap, args))
+        elseif f(map(jplyr.unsafe_get, args))
             for (j, v) in enumerate(whole_row)
                 push!(cols[j], v)
             end

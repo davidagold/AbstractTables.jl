@@ -40,10 +40,10 @@ end
 function _apply_select!(res_column, f, row_itr)
     T = eltype(res_column)
     for row in row_itr
-        if hasnulls(row)
+        if jplyr.hasnulls(row)
             push!(res_column, Nullable{T}())
         else
-            v = f(map(unwrap, row))
+            v = f(map(jplyr.unsafe_get, row))
             push!(res_column, v)
         end
     end
