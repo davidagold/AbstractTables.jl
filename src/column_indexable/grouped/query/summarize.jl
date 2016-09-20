@@ -58,7 +58,6 @@ end
         end
 
         new_tbl = default(g_tbl.source)
-        new_tbl.metadata[:groupby_predicates] = g_tbl.predicate_aliases
         for groupby_field in groupby_fields
             new_tbl[groupby_field] = groupby_columns[groupby_field]
         end
@@ -66,7 +65,7 @@ end
             res_field, f, g, arg_fields = jplyr.parts(helper)
             new_tbl[res_field] = res_columns[res_field]
         end
-        return new_tbl
+        return grouped(new_tbl, g_tbl.groupbys, g_tbl.predicate_aliases)
     end
 end
 
