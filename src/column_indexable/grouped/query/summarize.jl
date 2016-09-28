@@ -1,7 +1,6 @@
-function jplyr._collect{T<:AbstractTable}(
-    g_tbl::Grouped{T},
-    g::jplyr.SummarizeNode
-)
+function SQ._collect{T<:AbstractTable}(
+    g_tbl::Grouped{T}, g::SQ.SummarizeNode
+)::Grouped
     ngroupbys = length(g_tbl.groupbys)
     return group_summarize(Val{ngroupbys}(), g_tbl, g)
 end
@@ -21,7 +20,7 @@ function build_groupby_resources{T<:AbstractTable}(g_tbl::Grouped{T})
     return groupby_fields, groupby_columns
 end
 
-@generated function group_summarize{N}(::Val{N}, g_tbl, node)
+@generated function group_summarize{N}(::Val{N}, g_tbl, q)
     # generate expression for (group_1, ..., group_n) inner loop variables
     group_tuple_ex = Expr(:tuple)
     for i in 1:N
@@ -29,7 +28,7 @@ end
     end
 
     return quote
-        groupby_fields, groupby_columns  = build_groupby_resources(g_tbl)
+        groupby_fields, groupby_columns = build_groupby_resources(g_tbl)
         res_columns = Dict{Symbol, Vector}()
         group_levels = g_tbl.group_levels
 
@@ -43,8 +42,8 @@ end
 
             # compute each summarization and insert into appropriate
             # result column
-            for helper in node.helpers
-                res_field, f, g, arg_fields = jplyr.parts(helper)
+            for helper in q.helpers
+                res_field, f, g, arg_fields = SQ.parts(helper)
                 if haskey(res_columns, res_field)
                     push!(
                         res_columns[res_field],
@@ -61,11 +60,11 @@ end
         for groupby_field in groupby_fields
             new_tbl[groupby_field] = groupby_columns[groupby_field]
         end
-        for helper in node.helpers
-            res_field, f, g, arg_fields = jplyr.parts(helper)
+        for helper in q.helpers
+            res_field, f, g, arg_fields = SQ.parts(helper)
             new_tbl[res_field] = res_columns[res_field]
         end
-        return grouped(new_tbl, g_tbl.groupbys, g_tbl.predicate_aliases)
+        return groupby(new_tbl, g_tbl.groupbys, g_tbl.predicate_aliases)
     end
 end
 
@@ -73,11 +72,11 @@ function rhs_summarize(f, g, arg_fields, g_tbl, key)
     T, row_itr = _preprocess(f, arg_fields, g_tbl, key)
 
     # Allocate a temporary column.
-    temporary = Array(T, 0)
+    temp = Array(T, 0)
 
     # Fill the new column in row-by-row, skipping nulls.
-    grow_nonnull_output!(temporary, f, row_itr)
+    grow_nonnull_output!(temp, f, row_itr)
 
     # Return the summarization function applied to the temporary.
-    return g(temporary)
+    return g(temp)
 end

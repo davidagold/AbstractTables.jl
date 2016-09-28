@@ -14,7 +14,6 @@ function (::Type{MyTable})(; kwargs...)
     return res
 end
 
-
 # Satisfy AbstractTable interface
 # Note: This assumes that the order of collect(keys(tbl.cols)) respects that of
 # collect(values(tbl.cols))
@@ -65,7 +64,6 @@ Base.setindex!(tbl::MyTable, col, field) = setindex!(tbl.cols, col, field)
 # Satisfy querying requirements
 
 AbstractTables.default(::MyTable) = MyTable()
-AbstractTables.empty(::MyTable) = MyTable()
 
 # For testing
 

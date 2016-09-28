@@ -1,21 +1,20 @@
-function jplyr._collect{T<:AbstractTable}(g_tbl::Grouped{T}, g::jplyr.SelectNode)
+function SQ._collect{T<:AbstractTable}(
+    g_tbl::Grouped{T}, q::SQ.SelectNode
+)::Grouped
     src = g_tbl.source
-    new_src = empty(src)
+    new_src = default(src)
     groupby_fields = map(
         x -> isa(x, Symbol) ? x : g_tbl.predicate_aliases[x],
         g_tbl.groupbys
     )
-
     # Copy all columns involved in the original grouping
     for groupby_field in groupby_fields
         new_src[groupby_field] = src[groupby_field]
     end
-
     # Apply the select query
-    for helper in g.helpers
-        apply!(new_src, helper, src)
+    for h in q.helpers
+        apply!(new_src, h, src)
     end
-
     return Grouped(
         new_src,
         g_tbl.group_indices,

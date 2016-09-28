@@ -41,7 +41,7 @@ Returns:
 eachcol(tbl::AbstractTable) = zip(fields(tbl), columns(tbl))
 
 """
-    `eachrow(tbl, [flds...])`
+    `eachrow(tbl[, flds...])`
 
 Return an iterator over the rows (materialized as `Tuple`s) of `tbl`. If `flds`
 are specified, the tuples returned by the row iterator will contain data from
