@@ -1,27 +1,13 @@
-# function _collect(src, ::Iterable, q::SelectNode)
-
-"""
-Required interface:
-
-    * `default(src)`
-    * `eachrow(src [, fields...])`
-    * `eltypes(src [, fields...])`
-
-Note that `default` must return a type that satisfies the column indexable
-interface
-"""
-function jplyr._collect(src::AbstractTable, q::jplyr.SelectNode)
-    # TODO: Figure out interplay between `empty` and `default`
-    # res = empty(default(src))
+function StructuredQueries._collect(src::AbstractTable, q::StructuredQueries.SelectNode)
     res = default(src)
-    for helper in q.helpers
-        apply!(res, helper, src)
+    for h in q.helpers
+        apply!(res, h, src)
     end
     return res
 end
 
-function apply!(res, helper::jplyr.SelectHelper, src)
-    res_field, f, arg_fields, = jplyr.parts(helper)
+function apply!(res, h::SQ.SelectHelper, src)::Void
+    res_field, f, arg_fields, = SQ.parts(h)
     row_itr = eachrow(src, arg_fields...)
     inner_eltypes = map(
         eltype,
@@ -32,18 +18,19 @@ function apply!(res, helper::jplyr.SelectHelper, src)
     T = Core.Inference.return_type(f, (Tuple{inner_eltypes...},))
     res_column = NullableVector{T}()
 
-    _apply_select!(res_column, f, row_itr)
+    _apply!(res_column, h, row_itr)
     res[res_field] = res_column
     return
 end
 
-function _apply_select!(res_column, f, row_itr)
+function _apply!(res_column, h::SQ.SelectHelper, row_itr)::Void
     T = eltype(res_column)
+    f = h.f
     for row in row_itr
-        if jplyr.hasnulls(row)
+        if hasnulls(row)
             push!(res_column, Nullable{T}())
         else
-            v = f(map(jplyr.unsafe_get, row))
+            v = f(map(unsafe_get, row))
             push!(res_column, v)
         end
     end

@@ -6,7 +6,7 @@
 
 [![codecov.io](http://codecov.io/github/davidagold/AbstractTables.jl/coverage.svg?branch=master)](http://codecov.io/github/davidagold/AbstractTables.jl?branch=master)
 
-This package demonstrates a series of abstract interfaces for tabular data structures in Julia. Its objective is to support modularity and extensibility in the development of data management facilities. In particular, we demonstrate support for querying facilities that are generic over the class of so-called *column-indexable* tabular data structures. The latter are in-memory Julia objects that satisfy the column-indexable interface. The querying interface itself is provided by [(code-name) jplyr](https://github.com/davidagold/jplyr.jl) and extended by the present package.
+This package demonstrates a series of abstract interfaces for tabular data structures in Julia. Its objective is to support modularity and extensibility in the development of data management facilities. In particular, we demonstrate support for querying facilities that are generic over the class of so-called *column-indexable* tabular data structures. The latter are in-memory Julia objects that satisfy the column-indexable interface. The querying interface itself is provided by [(code-name) StructuredQueries](https://github.com/davidagold/StructuredQueries.jl) and extended by the present package.
 
 ## Interfaces
 
@@ -56,7 +56,7 @@ Provided methods:
 
 ### Query interface (column-indexable specific)
 
-The query interface for column-indexable types `T <: AbstractTable` leverages the ability to retrieve and set columns represented as in-memory Julia vectors in its extension of the `jplyr` `Query` framework.
+The query interface for column-indexable types `T <: AbstractTable` leverages the ability to retrieve and set columns represented as in-memory Julia vectors in its extension of the `StructuredQueries` `Query` framework.
 
 Required methods:
 * `default(tbl::T)`
