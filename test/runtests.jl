@@ -3,8 +3,12 @@ quiet = length(ARGS) > 0 && ARGS[1] == "-q"
 anyerrors = false
 
 my_tests = (
-    "query/query.jl",
-    "query/groupby.jl",
+    "column_indexable/collect/collect.jl",
+    "column_indexable/collect/select.jl",
+    "column_indexable/collect/filter.jl",
+    "column_indexable/collect/groupby.jl",
+    "column_indexable/collect/summarize.jl",
+    "column_indexable/collect/combinations.jl"
 )
 
 println("Running tests:")

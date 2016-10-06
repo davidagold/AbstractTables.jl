@@ -23,11 +23,16 @@ function _apply!(res, h::SQ.FilterHelper, row_itr)::Void
     idx = index(res)
     indices = [ idx[field] for field in arg_fields ]
     # TODO: Make sure following is safe (in case of error in push!ing)
+    # TODO: Find out if iterating over whole rows and pushing rows that satisfy
+    # filter predicate is more performant than iterating over rows derived only
+    # from columns that are arguments to filter predicate and producing a list
+    # of indices
     for whole_row in row_itr
         args = whole_row[indices]
-        if hasnulls(args)
+        v = f(args)
+        if isnull(v)
             continue
-        elseif f(map(unsafe_get, args))
+        elseif unsafe_get(v)
             for (j, v) in enumerate(whole_row)
                 push!(cols[j], v)
             end

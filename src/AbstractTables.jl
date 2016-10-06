@@ -32,18 +32,18 @@ include("column_indexable/show.jl")
 # Grouped{T}
 include("column_indexable/grouped/typedef.jl")
 include("column_indexable/grouped/show.jl")
-# query
-include("column_indexable/query/interface.jl")
-include("column_indexable/query/utils.jl")
-include("column_indexable/query/generic.jl")
-include("column_indexable/query/select.jl")
-include("column_indexable/query/filter.jl")
-include("column_indexable/query/groupby.jl")
-include("column_indexable/query/summarize.jl")
-# Grouped{T} query
-include("column_indexable/grouped/query/generic.jl")
-include("column_indexable/grouped/query/select.jl")
-include("column_indexable/grouped/query/filter.jl")
-include("column_indexable/grouped/query/summarize.jl")
+# collect
+include("column_indexable/collect/interface.jl")
+include("column_indexable/collect/utils.jl")
+include("column_indexable/collect/generic.jl")
+include("column_indexable/collect/select.jl")
+include("column_indexable/collect/filter.jl")
+include("column_indexable/collect/groupby.jl")
+include("column_indexable/collect/summarize.jl")
+# Grouped{T} collect
+include("column_indexable/grouped/collect/generic.jl")
+include("column_indexable/grouped/collect/select.jl")
+include("column_indexable/grouped/collect/filter.jl")
+include("column_indexable/grouped/collect/summarize.jl")
 
 end # module

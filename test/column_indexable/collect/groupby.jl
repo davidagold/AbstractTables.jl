@@ -1,19 +1,19 @@
 module TestGroupBy
-using AbstractTables
-using Base.Test
 
-include("mytable.jl")
+using AbstractTables
+using TestCollect
+using Base.Test
 
 name = ["Niamh", "Roger", "Genevieve", "Aiden"]
 age = [27, 63, 26, 17]
 eye_color = ["green", "brown", "brown", "blue"]
 
-tbl = MyTable(
+people = MyTable(
     name = NullableArray(name),
     age = NullableArray(age),
     eye_color = NullableArray(eye_color)
 )
-_tbl = copy(tbl)
+_people = copy(people)
 
 group_indices = Dict{Any, Vector{Int}}([
     ("brown",false) => [3],
@@ -22,14 +22,10 @@ group_indices = Dict{Any, Vector{Int}}([
     ("blue",false)  => [4],
 ])
 
-qrya = @query groupby(tbl, eye_color, age > 26)
-qryb = @query tbl |> groupby(eye_color, age > 26)
+q = @query groupby(people, eye_color, age > 26)
+res = collect(q)
 
-tbl2a = collect(qrya)
-tbl2b = collect(qryb)
-
-@test isequal(tbl, _tbl)
-@test isequal(tbl2a, tbl2b)
+@test isequal(people, _people)
 for (group_level, indices) in zip(
     [
         (Nullable("brown"), Nullable(false)),
@@ -44,9 +40,9 @@ for (group_level, indices) in zip(
         [4]
     ]
 )
-    @test isequal(tbl2a.group_indices[group_level], indices)
+    @test isequal(res.group_indices[group_level], indices)
 end
 
-@test isequal(tbl2a.groupbys, qrya.graph.args)
+@test isequal(res.groupbys, q.graph.args)
 
 end

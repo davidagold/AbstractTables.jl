@@ -38,10 +38,10 @@ Base.copy(tbl::MyTable) = MyTable(copy(tbl.cols))
 # Satisfy column-indexable interface
 
 AbstractTables.columns(tbl::MyTable) = collect(values(tbl.cols))
-
 Base.getindex(tbl::MyTable, field) = tbl.cols[field]
-
 Base.setindex!(tbl::MyTable, col, field) = setindex!(tbl.cols, col, field)
+
+AbstractTables.column_indexable(::MyTable) = true
 
 # function Base.setindex!(tbl::MyTable, col::AbstractArray, field::Symbol)
 #     nrows, ncols = nrow(tbl), ncol(tbl)
