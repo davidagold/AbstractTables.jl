@@ -7,14 +7,14 @@ using Compat
 const SQ = StructuredQueries
 
 export  AbstractTable,
-        fields,
-        eltypes,
-        index,
-        nrow,
-        ncol,
-        columns,
-        eachcol,
-        eachrow,
+        # fields,
+        # eltypes,
+        # index,
+        # nrow,
+        # ncol,
+        # columns,
+        # eachcol,
+        # eachrow,
         Grouped
 
 ##############################################################################

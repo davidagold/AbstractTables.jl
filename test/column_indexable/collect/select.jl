@@ -17,7 +17,7 @@ src = MyTable(
 )
 _src = copy(src)
 
-for (field, col) in eachcol(src)
+for (field, col) in AbstractTables.eachcol(src)
     @eval res = @collect select(src, $field)
     @test isequal(src, _src)
     @test isequal(

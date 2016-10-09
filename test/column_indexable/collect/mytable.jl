@@ -23,11 +23,11 @@ AbstractTables.fields(tbl::MyTable) = collect(keys(tbl.cols))
 AbstractTables.eltypes(tbl::MyTable) = map(eltype, collect(values(tbl.cols)))
 
 AbstractTables.nrow(tbl::MyTable) =
-    length(fields(tbl)) > 0 ? length(collect(values(tbl.cols))[1]) : 0
+    length(AbstractTables.fields(tbl)) > 0 ? length(collect(values(tbl.cols))[1]) : 0
 
 function AbstractTables.index(tbl::MyTable)
     idx = Dict{Symbol, Int}()
-    for (j, field) in enumerate(fields(tbl))
+    for (j, field) in enumerate(AbstractTables.fields(tbl))
         idx[field] = j
     end
     return idx
