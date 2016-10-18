@@ -22,7 +22,3 @@ function columns(tbl::AbstractTable)
     msg = @sprintf("Objects of type %s are not column-indexable", typeof(tbl))
     throw(ArgumentError(msg))
 end
-
-# Base.copy
-# Should this be a part of the column-indexable interface or the query
-# sub-interface?

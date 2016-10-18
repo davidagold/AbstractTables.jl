@@ -1,9 +1,7 @@
 # AbstractTables
 
 [![Build Status](https://travis-ci.org/davidagold/AbstractTables.jl.svg?branch=master)](https://travis-ci.org/davidagold/AbstractTables.jl)
-
 <!--[![Coverage Status](https://coveralls.io/repos/davidagold/AbstractTables.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/davidagold/AbstractTables.jl?branch=master)-->
-
 [![codecov.io](http://codecov.io/github/davidagold/AbstractTables.jl/coverage.svg?branch=master)](http://codecov.io/github/davidagold/AbstractTables.jl?branch=master)
 
 This package demonstrates a series of abstract interfaces for tabular data structures in Julia. Its objective is to support modularity and extensibility in the development of data management facilities. In particular, we demonstrate support for querying facilities that are generic over the class of so-called *column-indexable* tabular data structures. The latter are in-memory Julia objects that satisfy the column-indexable interface. The querying interface itself is provided by [(code-name) StructuredQueries](https://github.com/davidagold/StructuredQueries.jl) and extended by the present package.
@@ -26,12 +24,12 @@ The present package defines three interfaces:
 
 ### `AbstractTable` interface
 
-The basic `AbstractTable` interface for a tabular data type `T <: AbstractTable` consists of minimalist funtionality concerning only the "schema" of tables of type `T <: AbstractTable`; it neither requires nor exposes any methods that depend on specific storage layouts of the data contained in the table. 
+The basic `AbstractTable` interface for a tabular data type `T <: AbstractTable` consists of minimalist funtionality concerning only the "schema" of tables of type `T <: AbstractTable`; it neither requires nor exposes any methods that depend on specific storage layouts of the data contained in the table.
 
 Requisite methods:
 * `AbstractTables.fields(tbl::T)`
 * `AbstractTables.eltypes(tbl::T)`
-* `AbstractTables.nrow(tbl::T)` 
+* `AbstractTables.nrow(tbl::T)`
 * `AbstractTables.index(tbl::T)`
 
 Provided methods:
@@ -60,7 +58,7 @@ The query interface for column-indexable types `T <: AbstractTable` leverages th
 
 Required methods:
 * `default(tbl::T)`
-* `empty(tbl::T)`
+* `Base.copy(tbl::T)`
 
 Provided methods:
 * `collect(Query{T})`

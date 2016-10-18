@@ -1,4 +1,4 @@
-function SQ._collect(src, q::SQ.FilterNode)
+function SQ._collect(src::AbstractTable, q::SQ.FilterNode)
     res = default(src)
     flds = fields(src)
     for (field, T) in zip(flds, map(eltype, eltypes(src, flds...)))

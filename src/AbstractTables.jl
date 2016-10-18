@@ -8,8 +8,8 @@ const SQ = StructuredQueries
 
 export  AbstractTable,
         # fields,
-        # eltypes,
         # index,
+        # eltypes,
         # nrow,
         # ncol,
         # columns,
@@ -29,6 +29,7 @@ include("abstracttable/traits.jl")
 include("abstracttable/primitives.jl")
 include("abstracttable/show.jl")
 include("abstracttable/interface.jl")
+include("abstracttable/collect.jl")
 
 ##############################################################################
 ##

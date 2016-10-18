@@ -1,4 +1,4 @@
-type Grouped{T, I}
+type Grouped{T, I} <: AbstractTable
     source::T
     group_indices::I
     group_levels

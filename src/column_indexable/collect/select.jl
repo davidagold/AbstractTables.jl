@@ -1,4 +1,6 @@
-function StructuredQueries._collect(src::AbstractTable, q::StructuredQueries.SelectNode)
+function StructuredQueries._collect(
+    src::AbstractTable, q::StructuredQueries.SelectNode
+)
     res = default(src)
     for h in q.helpers
         apply!(res, h, src)

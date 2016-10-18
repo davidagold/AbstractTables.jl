@@ -1,4 +1,4 @@
-function SQ._collect(tbl, g::SQ.GroupbyNode)
+function SQ._collect(tbl::AbstractTable, g::SQ.GroupbyNode)
     src = copy(tbl)
     predicate_aliases = Dict{Expr, Symbol}()
     pre_groupby!(src, g, predicate_aliases)
