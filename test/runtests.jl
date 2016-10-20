@@ -2,14 +2,23 @@ fatalerrors = length(ARGS) > 0 && ARGS[1] == "-f"
 quiet = length(ARGS) > 0 && ARGS[1] == "-q"
 anyerrors = false
 
-my_tests = (
-    "column_indexable/collect/collect.jl",
-    "column_indexable/collect/select.jl",
-    "column_indexable/collect/filter.jl",
-    "column_indexable/collect/groupby.jl",
-    "column_indexable/collect/summarize.jl",
-    "column_indexable/collect/combinations.jl"
-)
+my_tests = (vcat(
+    map(x->joinpath("column_indexable/collect", x),
+        [
+            "collect.jl",
+            "select.jl",
+            "filter.jl",
+            "groupby.jl",
+            "summarize.jl",
+            "combinations.jl",
+        ]
+    ),
+    map(x->joinpath("column_indexable/grouped/collect", x),
+        [
+            "summarize.jl",
+        ]
+    )
+))
 
 println("Running tests:")
 

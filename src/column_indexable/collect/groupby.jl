@@ -1,72 +1,76 @@
-function SQ._collect(tbl::AbstractTable, g::SQ.GroupbyNode)
-    src = copy(tbl)
-    predicate_aliases = Dict{Expr, Symbol}()
-    pre_groupby!(src, g, predicate_aliases)
-    return groupby(src, g.args, predicate_aliases)
+function SQ._collect(_src::AbstractTable, q::SQ.GroupbyNode)
+    # Make a copy, don't mutate
+    src = copy(_src)
+    # Map from predicates (e.g. `A > .5`) to aliasing column names (e.g. `pred_1`)
+    predicates = Dict{Symbol, Expr}()
+    groupbys = pre_groupby!(src, q, predicates)
+    return groupby(src, groupbys, predicates)
 end
 
 """
+    pre_groupby!(src, q, predicate_aliases)
+
+(i) push predicate aliases (e.g. `:(A > .5) => :pred_1`) to `predicate_aliases`;
+(ii) mutate src to include predicate transformations.
 """
-function pre_groupby!(src, q, predicate_aliases)
-    i = 1 # count number of predicate aliases
-    for (h, arg) in zip(q.helpers, q.args)
+function pre_groupby!(src, q, predicates)
+    _groupbys = copy(q.args)
+    groupbys = Vector{Symbol}(length(_groupbys))
+    i = 1 # count number of predicates encountered
+    for (h, (j, groupby)) in zip(q.helpers, enumerate(_groupbys))
         is_predicate, f, arg_fields = SQ.parts(h)
         if is_predicate
-            predicate_alias = Symbol("pred_$i")
-            predicate_aliases[arg] = predicate_alias
+            alias = Symbol("pred_$i")
+            predicates[alias] = groupby
+            groupbys[j] = alias
             # include the result of applying the predicate as a new column
-            apply!(src, SQ.SelectHelper(predicate_alias, f, arg_fields), src)
+            apply!(src, SQ.SelectHelper(alias, f, arg_fields), src)
             i += 1
+        else
+            groupbys[j] = Symbol(groupby)
         end
     end
+    return groupbys
 end
 
 """
+    groupby{T<:AbstractTable}(src::T, groupbys, predicate_aliases)::Grouped{T}
+
+
 """
-function groupby{T<:AbstractTable}(
-    src::T, groupbys, predicate_aliases
-)::Grouped{T}
+function groupby{T<:AbstractTable}(src::T, groupbys, predicates)::Grouped
+    metadata = Dict{Symbol, Any}()
+    metadata[:predicates] = predicates
     # obtain the field names of the groupbys (either the names of the selected
     # columns or the predicate aliases given to groupby predicates)
-    # TODO: store this information in the `groupbys` field of the result
-    groupby_fields = map(x->isa(x, Symbol) ? x : predicate_aliases[x], groupbys)
-    group_indices = build_group_indices(src, groupby_fields)
-    group_levels = build_group_levels(group_indices, length(groupby_fields))
-    return Grouped(
-        src,
-        group_indices,
-        GroupLevels(group_levels),
-        groupbys,
-        predicate_aliases
-    )
+    # groupbys = map(x->isa(x, Symbol) ? x : aliases[x], groupbys)
+    group_indices, group_levels = build_group_data(src, groupbys)
+    # TODO: work out this collect(src) hack
+    return Grouped(collect(src), group_indices, groupbys, group_levels, metadata)
+    # return Grouped(src, group_indices, groupbys, group_levels, metadata)
 end
 
-function build_group_levels(group_indices, ngroupbys)
-    joint_group_levels = collect(keys(group_indices))
-    group_levels = Vector{Vector}(ngroupbys)
-    for j in 1:ngroupbys
-        group_levels[j] = [ level[j] for level in joint_group_levels ]
-    end
-    map!(unique, group_levels)
-    return group_levels
-end
-
-function build_group_indices(tbl, groupbys)
-    row_itr = eachrow(tbl, groupbys...)
+"""
+    build_group_data(src, groupbys)
+"""
+function build_group_data(src, groupbys)
+    row_itr = eachrow(src, groupbys...)
     # TODO: type this more strongly
     group_indices = Dict{Any, Vector{Int}}()
-    grow_indices!(group_indices, row_itr)
-    return group_indices
+    group_levels = grow_indices!(group_indices, row_itr)
+    return group_indices, group_levels
 end
 
-@noinline function grow_indices!(group_indices, row_itr)
+@noinline function grow_indices!(group_indices, row_itr)::Vector{Tuple}
+    group_levels = Vector{Tuple}()
     for (i, row) in enumerate(row_itr)
-        group_level = row
-        if haskey(group_indices, group_level)
-            push!(group_indices[group_level], i)
+        # the row is the group level
+        if haskey(group_indices, row)
+            push!(group_indices[row], i)
         else
-            group_indices[group_level] = [i]
+            group_indices[row] = [i]
+            push!(group_levels, row)
         end
     end
-    return group_indices
+    return group_levels
 end

@@ -1,12 +1,12 @@
-function _preprocess(f, arg_fields, g_tbl, key)
+function _preprocess(f, arg_fields, g_tbl, outer_level)
     # Extract columns
-    source = g_tbl.source
-    indices = g_tbl.group_indices[key]
-    row_itr = zip([ source[field][indices] for field in arg_fields ]...)
+    src = g_tbl.source
+    indices = g_tbl.group_indices[outer_level]
+    row_itr = zip([ src[field][indices] for field in arg_fields ]...)
 
     # Determine the type of the iterator (possibly after unwrapping Nullable
     # types)
-    inner_eltypes = map(eltype, eltypes(source, arg_fields...))
+    inner_eltypes = map(eltype, eltypes(src, arg_fields...))
 
     # See if inference knows the return type for rowwise kernel
     T = Core.Inference.return_type(f, (Tuple{inner_eltypes...}, ))

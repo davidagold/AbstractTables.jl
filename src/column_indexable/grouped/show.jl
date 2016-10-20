@@ -1,34 +1,29 @@
 function Base.show(
-    io::IO,
-    g_tbl::Grouped,
-    # splitchunks::Bool = true,
-    rowlabel::Symbol = Symbol("Row"),
-    displaysummary::Bool = true
+    io::IO, g_tbl::Grouped, # splitchunks::Bool = true,
+    rowlabel::Symbol = Symbol("Row"), displaysummary::Bool = true
 )::Void
     groupbys = g_tbl.groupbys
-    nargs = length(groupbys)
+    # nargs = length(groupbys)
+    predicates = g_tbl.metadata[:predicates]
     @printf(io, "Grouped %s\n", typeof(g_tbl).parameters[1])
     println(io, "Groupings by:")
     for groupby in groupbys
         print(io, " "^4)
-        print_groupby(io, groupby, g_tbl.predicate_aliases)
+        print_groupby(io, groupby, predicates)
     end
     println()
     print(io, "Source: "); show(io, g_tbl.source)
     return
 end
 
-function print_groupby(io, groupby, predicate_aliases)::Void
-    if isa(groupby, Symbol)
-        @printf(io, "%s \n", string(groupby))
-    else
-        groupby_pred = predicate_aliases[groupby]
+function print_groupby(io, groupby, predicates)::Void
+    if haskey(predicates, groupby)
+        predicate = predicates[groupby]
         @printf(
-            io,
-            "%s (with alias :%s) \n",
-            string(groupby),
-            string(groupby_pred)
+            io, "%s (with alias :%s) \n", string(groupby), string(predicate)
         )
+    else
+        @printf(io, "%s \n", string(groupby))
     end
     return
 end
