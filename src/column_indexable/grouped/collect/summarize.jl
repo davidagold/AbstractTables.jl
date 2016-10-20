@@ -7,7 +7,7 @@ SQ._collect(g_tbl::Grouped, q::SQ.SummarizeNode) =
 Return a `NullableVector` column
 """
 new_groupby_column(src, groupby)::NullableVector =
-    NullableVector{eltype(src[groupby])}()
+    NullableVector{eltype(eltype(src[groupby]))}()
 
 """
     new_res_column(src, h)::NullableVector
@@ -20,7 +20,7 @@ function new_res_column(src, h)::NullableVector
     T = Core.Inference.return_type(f, (Tuple{inner_eltypes...}, ))
     U = Core.Inference.return_type(g, Tuple{Vector{T}})
     # TODO: slow path for non-leaf return types!
-    return NullableVector{U}()
+    return NullableVector{eltype(U)}()
 end
 
 """

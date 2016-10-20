@@ -14,18 +14,22 @@ src = MyTable(
     C = NullableArray(C),
 )
 
-indices0 = find(x->x==0, C)
 indices1 = find(x->x==1, C)
-_A0 = A[indices0]
+indices2 = find(x->x==2, C)
 _A1 = A[indices1]
-avg_A0 = mean(_A0)
+_A2 = A[indices2]
 avg_A1 = mean(_A1)
+avg_A2 = mean(_A2)
 _res = MyTable(
-    C = NullableArray([0, 1]),
-    avg = NullableArray([avg_A0, avg_A1]),
+    C = NullableArray([1, 2]),
+    avg = NullableArray([avg_A1, avg_A2]),
 )
-
 res = @collect groupby(src, C) |>
     summarize(avg = mean(A))
+
+# Test Sets because summarize doesn't guarantee ordering.
+# TODO: Better workaround for above.
+@test isequal(Set(_res[:C]), Set(res[:C]))
+@test isequal(Set(_res[:avg]), Set(res[:avg]))
 
 end

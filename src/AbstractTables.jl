@@ -59,6 +59,8 @@ include("column_indexable/collect/summarize.jl")
 
 # API
 include("column_indexable/grouped/typedef.jl")
+include("column_indexable/grouped/primitives.jl")
+include("column_indexable/grouped/interfaces/column_indexable.jl")
 include("column_indexable/grouped/show.jl")
 
 # collect
