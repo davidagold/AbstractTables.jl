@@ -46,10 +46,13 @@ include("column_indexable/show.jl")
 include("column_indexable/collect/interface.jl")
 include("column_indexable/collect/utils.jl")
 include("column_indexable/collect/generic.jl")
+# One-Table
 include("column_indexable/collect/select.jl")
 include("column_indexable/collect/filter.jl")
 include("column_indexable/collect/groupby.jl")
 include("column_indexable/collect/summarize.jl")
+# N-Table
+include("column_indexable/collect/join/innerjoin.jl")
 
 ##############################################################################
 ##

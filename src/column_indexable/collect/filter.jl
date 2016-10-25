@@ -1,44 +1,54 @@
-function SQ._collect(src::AbstractTable, q::SQ.FilterNode)
+# function start(q)
+
+
+function SQ._collect(srcs, q::SQ.Node{:filter})
+
+    # assume there's only one source
+    # Following is not generic over multiple sources, but that's okay for now
+
+    # @show srcs
+    src = first(srcs)
     res = default(src)
-    flds = fields(src)
-    for (field, T) in zip(flds, map(eltype, eltypes(src, flds...)))
-        res[field] = NullableVector{T}()
-    end
+    col_index = index(src)
+
+    _predicates = []
+    arg_idxs = Vector{Tuple{Vararg{Int}}}()
     for h in q.helpers
-        apply!(res, h, src)
+        f, arg_fields = h.parts
+        push!(_predicates, f)
+        push!(arg_idxs, tuple([ col_index[field] for field in arg_fields[:i] ]...))
+    end
+    predicates = tuple(_predicates...)
+
+    # res = default(srcs)
+    # arg_idxs = Dict{Symbol, Tuple{Vararg{Int}}}()
+    # src_indexes = Dict{Symbol, Dict{Symbol, Int}}()
+    # src_indexes = [ index(src) for src in srcs ]
+    # for token in keys(arg_fields)
+    #     arg_idxs[token] =
+    #         tuple([ src_indexes[token][field] for field in arg_fields[token] ]...)
+    # end
+
+    for (field, T) in zip(fields(src), eltypes(src))
+        res[field] = NullableVector{eltype(T)}()
+    end
+
+    cols = columns(res)
+    rows = eachrow(src)
+    #
+    # for token in keys(arg_fields)
+    #     idxs = arg_idxs[token]
+    #     rows = eachrow(srcs[token])
+
+    # idxs = arg_idxs_map
+    for i in rows
+        v = Nullable(true)
+        for (p, idx) in zip(predicates, arg_idxs)
+            args = subset(i, idx)
+            v = SQ.lift(&, v, p(args))
+            ifelse(v.hasvalue, v.value, false) || break
+        end
+        ifelse(v.hasvalue, v.value, false) && pushrow!(cols, i)
     end
     return res
-end
-
-function apply!(res, h::SQ.FilterHelper, src)::Void
-    f, arg_fields, = SQ.parts(h)
-    row_itr = eachrow(src)
-    _apply!(res, h, row_itr)
-    return
-end
-
-function _apply!(res, h::SQ.FilterHelper, row_itr)::Void
-    f, arg_fields = SQ.parts(h)
-    cols = columns(res)
-    idx = index(res)
-    indices = [ idx[field] for field in arg_fields ]
-    # TODO: Make sure following is safe (in case of error in push!ing)
-    # TODO: Find out if iterating over whole rows and pushing rows that satisfy
-    # filter predicate is more performant than iterating over rows derived only
-    # from columns that are arguments to filter predicate and producing a list
-    # of indices
-    for whole_row in row_itr
-        args = whole_row[indices]
-        v = f(args)
-        if isnull(v)
-            continue
-        elseif unsafe_get(v)
-            for (j, v) in enumerate(whole_row)
-                push!(cols[j], v)
-            end
-        else
-            continue
-        end
-    end
-    return
 end
